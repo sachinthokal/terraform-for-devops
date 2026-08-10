@@ -1,27 +1,27 @@
 variable "cluster_name" {
-  description = "The name of the Kind cluster"
   type        = string
-  default     = "terraform-cluster"
-}
-
-variable "cluster_ports" {
-  type = list(object({
-    container_port = number
-    host_port      = number
-    protocol       = string
-  }))
-  default = [
-    { container_port = 30081, host_port = 8081, protocol = "TCP" },
-    { container_port = 30082, host_port = 8082, protocol = "TCP" },
-    { container_port = 30083, host_port = 8083, protocol = "TCP" },
-    { container_port = 30084, host_port = 8084, protocol = "TCP" },
-    { container_port = 30085, host_port = 8085, protocol = "TCP" },
-    { container_port = 30086, host_port = 8086, protocol = "TCP" }
-  ]
+  description = "Name of the Kind cluster"
+  default     = "dev-cluster"
 }
 
 variable "node_image" {
-  description = "The Kind node image to use for all nodes"
   type        = string
-  default     = "kindest/node:v1.35.0"
+  description = "Kind node image version"
+  default     = "kindest/node:v1.30.0"
+}
+
+variable "port_mappings" {
+  type = list(object({
+    host_port      = number
+    container_port = number
+    protocol       = string
+  }))
+  description = "List of extra port mappings from host to worker node"
+  default = [
+    { host_port = 8081, container_port = 30081, protocol = "TCP" },
+    { host_port = 8082, container_port = 30082, protocol = "TCP" },
+    { host_port = 8083, container_port = 30083, protocol = "TCP" },
+    { host_port = 8084, container_port = 30084, protocol = "TCP" },
+    { host_port = 8085, container_port = 30085, protocol = "TCP" },
+  ]
 }

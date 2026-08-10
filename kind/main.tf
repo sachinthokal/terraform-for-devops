@@ -1,38 +1,29 @@
 resource "kind_cluster" "default" {
   name           = var.cluster_name
+  node_image     = var.node_image
   wait_for_ready = true
 
   kind_config {
     kind        = "Cluster"
     api_version = "kind.x-k8s.io/v1alpha4"
 
-    # Control Plane Node with your Port Mappings
+    # Control Plane Node
     node {
-      role  = "control-plane"
-      image = var.node_image
+      role = "control-plane"
+    }
 
-      # ---- Dynamic Port Mappings ----
+    # Worker Node with Dynamic Extra Port Mappings
+    node {
+      role = "worker"
+
       dynamic "extra_port_mappings" {
-        for_each = var.cluster_ports
+        for_each = var.port_mappings
         content {
-          container_port = extra_port_mappings.value.container_port
           host_port      = extra_port_mappings.value.host_port
+          container_port = extra_port_mappings.value.container_port
           protocol       = extra_port_mappings.value.protocol
         }
       }
-      # ------------------------------------
-    }
-
-    # Worker Node 1
-    node {
-      role  = "worker"
-      image = var.node_image
-    }
-
-    # Worker Node 2
-    node {
-      role  = "worker"
-      image = var.node_image
     }
   }
 }
