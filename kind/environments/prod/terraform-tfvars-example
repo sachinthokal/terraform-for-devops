@@ -1,0 +1,14 @@
+cluster_name        = "prod-cluster"
+node_image          = "kindest/node:v1.30.0"
+disable_default_cni = true
+pod_subnet          = "192.168.0.0/16"
+ingress_http_port   = 80
+ingress_https_port  = 443
+
+port_mappings = [
+  { host_port = 8081, container_port = 30081, protocol = "TCP" },
+  { host_port = 8082, container_port = 30082, protocol = "TCP" },
+  { host_port = 8083, container_port = 30083, protocol = "TCP" },
+  { host_port = 8084, container_port = 30084, protocol = "TCP" },
+  { host_port = 8085, container_port = 30085, protocol = "TCP" }
+]
