@@ -43,7 +43,7 @@ provider "registry.terraform.io/hashicorp/null" {
 
 provider "registry.terraform.io/tehcyx/kind" {
   version     = "0.5.1"
-  constraints = "~> 0.5.0"
+  constraints = "~> 0.5.0, >= 0.5.1"
   hashes = [
     "h1:RhuvEnk33ELQSVtOYydIvkxMa2ZX+8OkbkNzgPC/uH8=",
     "zh:0ac1fa0b309ed577e8e625de76895076d4b4d269703a6904ceb381584e052e33",
