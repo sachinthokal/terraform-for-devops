@@ -11,7 +11,6 @@ module "kind_cluster" {
 }
 
 # 1. Calico CNI Bootstrap & Wait
-# 1. Calico CNI Bootstrap & Wait
 resource "null_resource" "bootstrap_calico_cni" {
   depends_on = [module.kind_cluster]
 
@@ -95,4 +94,22 @@ resource "helm_release" "argocd" {
   ]
 
   depends_on = [helm_release.vault]
+}
+
+# 5. Metrics Server Installation (Direct Kind Patch)
+resource "null_resource" "install_metrics_server" {
+  depends_on = [null_resource.bootstrap_calico_cni]
+
+  provisioner "local-exec" {
+    command = "kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml && kubectl patch deployment metrics-server -n kube-system --type='json' -p='[{\"op\": \"add\", \"path\": \"/spec/template/spec/containers/0/args/-\", \"value\": \"--kubelet-insecure-tls\"}]' && kubectl rollout status deployment/metrics-server -n kube-system --timeout=120s"
+  }
+}
+
+# 6. Ingress-Nginx Controller Installation (Kind Clean Setup)
+resource "null_resource" "install_ingress_nginx" {
+  depends_on = [null_resource.bootstrap_calico_cni]
+
+  provisioner "local-exec" {
+    command = "kubectl label nodes --all ingress-ready=true --overwrite && kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml && kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission 2>/dev/null || true && kubectl delete job -n ingress-nginx --all 2>/dev/null || true && kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=180s"
+  }
 }
