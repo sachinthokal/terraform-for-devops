@@ -110,6 +110,19 @@ resource "null_resource" "install_ingress_nginx" {
   depends_on = [null_resource.bootstrap_calico_cni]
 
   provisioner "local-exec" {
-    command = "kubectl label nodes --all ingress-ready=true --overwrite && kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml && kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission 2>/dev/null || true && kubectl delete job -n ingress-nginx --all 2>/dev/null || true && kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=180s"
+    command = <<-EOT
+      # Control-plane la label
+      kubectl label node ${var.cluster_name}-control-plane ingress-ready=true --overwrite
+      kubectl label node ${var.cluster_name}-worker ingress-ready- 2>/dev/null || true
+
+      # Official Kind-compatible manifest apply kara
+      kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+
+      # Controller pod ready honyachi vat bgha
+      kubectl wait --namespace ingress-nginx \
+        --for=condition=ready pod \
+        --selector=app.kubernetes.io/component=controller \
+        --timeout=300s
+    EOT
   }
 }
