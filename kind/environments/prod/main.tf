@@ -109,6 +109,6 @@ resource "null_resource" "install_ingress_nginx" {
   depends_on = [null_resource.bootstrap_calico_cni]
 
   provisioner "local-exec" {
-    command = "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml && kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=300s"
+    command = "kubectl label node ${var.cluster_name}-control-plane ingress-ready=true --overwrite=true && kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml && kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=300s"
   }
 }
