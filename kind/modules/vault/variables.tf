@@ -7,5 +7,5 @@ variable "namespace" {
 variable "node_port" {
   type        = number
   description = "NodePort for Vault service"
-  default     = 30084
+  default     = 30087
 }

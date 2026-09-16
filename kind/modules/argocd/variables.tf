@@ -10,8 +10,8 @@ variable "chart_version" {
   default     = "5.53.0"
 }
 
-variable "node_port_https" {
+variable "node_port_http" {
   type        = number
-  description = "NodePort for Argo CD HTTPS service"
-  default     = 30085
+  description = "NodePort for Argo CD HTTP service"
+  default     = 30086
 }

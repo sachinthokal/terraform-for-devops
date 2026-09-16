@@ -27,6 +27,13 @@ resource "helm_release" "ingress_nginx" {
             effect   = "NoSchedule"
           }
         ]
+        service = {
+          type = "NodePort"
+          nodePorts = {
+            http = 30081
+            https = 30443  <-  HTTPS
+          }
+        }
         admissionWebhooks = {
           patch = {
             enabled = true
