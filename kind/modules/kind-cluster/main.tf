@@ -25,8 +25,8 @@ resource "null_resource" "kind_cluster" {
 
   provisioner "local-exec" {
     command = <<EOT
-      if kind get clusters | grep -q "^\({var.cluster_name}\)"; then
-        echo "Cluster ${var.cluster_name} already exists. Deleting existing cluster to apply new configuration..."
+      if kind get clusters | grep -w "${var.cluster_name}"; then
+        echo "Cluster ${var.cluster_name} already exists. Deleting..."
         kind delete cluster --name ${var.cluster_name}
       fi
       kind create cluster --config ${local_file.kind_config.filename}
