@@ -31,7 +31,7 @@ resource "helm_release" "ingress_nginx" {
           type = "NodePort"
           nodePorts = {
             http = 30081
-            https = 30443  <-  HTTPS
+            https = 30443
           }
         }
         admissionWebhooks = {
