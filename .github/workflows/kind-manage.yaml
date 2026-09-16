@@ -12,7 +12,6 @@ on:
           - stop
           - start
           - destroy
-          - apply
 
 jobs:
   manage-cluster:
@@ -44,10 +43,7 @@ jobs:
             docker start $(docker ps -a --filter "name=${CLUSTER_NAME}" -q) || echo "No containers found to start."
 
           elif [ "$SELECTED_ACTION" == "destroy" ]; then
-            echo "Destroying Kind cluster completely via Terraform..."
-            terraform destroy --auto-approve
-
-          elif [ "$SELECTED_ACTION" == "apply" ]; then
-            echo "Creating/Applying Kind cluster via Terraform..."
-            terraform apply --auto-approve
-          fi
+            echo "Extracting cluster name dynamically from Terraform state..."
+            CLUSTER_NAME=$(terraform output -raw cluster_name 2>/dev/null || echo "devops-cluster")
+            echo "Deleting Kind cluster: $CLUSTER_NAME"
+            kind delete cluster --name "$CLUSTER_NAME"
