@@ -6,6 +6,16 @@ on:
     paths:
       - 'kind/**'                             # Check for changes in the kind directory
       - '.github/workflows/kind-deploy.yaml'   # Check for changes in the workflow file
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Terraform Action'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+          - apply
+          - destroy
 
 jobs:
   # 1. Reusable GitLeak workflow call
@@ -26,8 +36,13 @@ jobs:
         run: terraform init
         working-directory: kind
 
-      - name: Terraform Apply
-        run: terraform apply --auto-approve
+      - name: Terraform Apply or Destroy
+        run: |
+          if [ "${{ github.event.inputs.action }}" == "destroy" ]; then
+            terraform destroy --auto-approve
+          else
+            terraform apply --auto-approve
+          fi
         working-directory: kind
 
       - name: Verify Pods
