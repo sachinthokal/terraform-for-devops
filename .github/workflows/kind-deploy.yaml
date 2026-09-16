@@ -10,6 +10,7 @@ on:
 jobs:
   # 1. Reusable GitLeak workflow call
   gitleaks-scan:
+    name: GitLeak Scan
     uses: ./.github/workflows/gitleaks.yaml
 
   # 2. Kind Deployment Job
