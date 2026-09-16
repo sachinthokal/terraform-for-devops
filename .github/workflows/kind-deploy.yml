@@ -6,6 +6,7 @@ on:
 
 jobs:
   deploy:
+    name: Kind DevOps Cluster Deployment
     runs-on: self-hosted    # sachin-pc runner
     steps:
       - name: Checkout Code

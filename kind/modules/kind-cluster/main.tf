@@ -24,7 +24,13 @@ resource "null_resource" "kind_cluster" {
   }
 
   provisioner "local-exec" {
-    command = "kind create cluster --config ${local_file.kind_config.filename}"
+    command = <<EOT
+      if kind get clusters | grep -q "^\({var.cluster_name}\)"; then
+        echo "Cluster ${var.cluster_name} already exists. Deleting existing cluster to apply new configuration..."
+        kind delete cluster --name ${var.cluster_name}
+      fi
+      kind create cluster --config ${local_file.kind_config.filename}
+    EOT
   }
 
   provisioner "local-exec" {
