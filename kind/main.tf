@@ -29,7 +29,7 @@ module "csi_secrets_store" {
 module "vault" {
   source     = "./modules/vault"
   namespace  = "vault"
-  node_port  = 30084
+  node_port  = 30087
   depends_on = [module.csi_secrets_store]
 }
 
