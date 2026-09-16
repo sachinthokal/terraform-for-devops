@@ -1,0 +1,18 @@
+name: Reusable Gitleaks Scan
+
+on:
+  workflow_call: # 👈 Call this workflow from any other workflows.
+
+jobs:
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Scan whole history
+
+      - name: Run Gitleaks Security Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

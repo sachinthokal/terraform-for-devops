@@ -1,7 +1,3 @@
-resource "random_id" "cluster_suffix" {
-  byte_length = 4
-}
-
 resource "local_file" "kind_config" {
   content = templatefile("${path.module}/templates/kind-config.yaml.tftpl", {
     cluster_name        = var.cluster_name
@@ -14,7 +10,7 @@ resource "local_file" "kind_config" {
     argocd_host_port    = var.argocd_host_port
     vault_host_port     = var.vault_host_port
   })
-  filename = "${path.root}/.terraform/kind-config-${random_id.cluster_suffix.hex}.yaml"
+  filename = "${path.root}/.terraform/kind-config.yaml"
 }
 
 resource "null_resource" "kind_cluster" {

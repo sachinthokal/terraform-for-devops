@@ -3,16 +3,25 @@ name: Local Terraform Kind Deployment
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'kind/**'                             # Check for changes in the kind directory
+      - '.github/workflows/kind-deploy.yaml'   # Check for changes in the workflow file
 
 jobs:
-  deploy:
+  # 1. Reusable GitLeak workflow call
+  gitleaks-scan:
+    uses: ./.github/workflows/gitleaks.yaml
+
+  # 2. Kind Deployment Job
+  kind-deploy:
+    needs: gitleaks-scan   # 👈 Gitleaks pass
     name: Kind DevOps Cluster Deployment
     runs-on: self-hosted    # sachin-pc runner
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 1. Terraform Cache Setup (Fixed syntax)
+      # 1. Terraform Cache Setup
       - name: Cache Terraform directories
         uses: actions/cache@v4
         with:
@@ -46,5 +55,5 @@ jobs:
           echo "#### 🛠️ Useful Commands:" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
           echo "# Get ArgoCD Password:" >> $GITHUB_STEP_SUMMARY
-          echo "kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d" >> $GITHUB_STEP_SUMMARY
+          echo "kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d && echo" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
