@@ -20,10 +20,10 @@ nodes:
   - containerPort: 443
     hostPort: ${ingress_https_port}
     protocol: TCP
-  - containerPort: 30085
+  - containerPort: 30086
     hostPort: ${argocd_host_port}
     protocol: TCP
-  - containerPort: 30084
+  - containerPort: 30087
     hostPort: ${vault_host_port}
     protocol: TCP
 %{ for pm in port_mappings ~}
