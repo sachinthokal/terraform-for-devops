@@ -11,9 +11,20 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # 1. Terraform Cache Setup (Fixed syntax)
+      - name: Cache Terraform directories
+        uses: actions/cache@v4
+        with:
+          path: |
+            kind/.terraform
+            ~/.terraform.d/plugin-cache
+          key: ${{ runner.os }}-terraform-${{ hashFiles('kind/**/*.tf') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-
+
       - name: Terraform Init
         run: terraform init
-        working-directory: kind # terraform working directory for kind deployment
+        working-directory: kind
 
       - name: Terraform Apply
         run: terraform apply --auto-approve
@@ -21,3 +32,18 @@ jobs:
 
       - name: Verify Pods
         run: kubectl get pods -A
+
+      - name: Publish Summary to GitHub Actions
+        run: |
+          echo "### 🚀 Local DevOps Cluster Deployed Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "#### 🔗 Access Endpoints:" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | URL / Port | Credentials |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| **ArgoCD** | \`https://localhost:8086\` | User: \`admin\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Vault** | \`https://localhost:8087\` | User: \`admin\` / Pass: \`root\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "#### 🛠️ Useful Commands:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "# Get ArgoCD Password:" >> $GITHUB_STEP_SUMMARY
+          echo "kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
