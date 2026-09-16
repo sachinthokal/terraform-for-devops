@@ -1,9 +1,8 @@
 terraform {
   required_version = ">= 1.5.0"
 
-  # backend block  👈 Local backend 
   backend "local" {
-    path = "./terraform.tfstate"
+    path = "/home/sachinthokal/terraform-state-store/kind/terraform.tfstate"
   }
 
   required_providers {
