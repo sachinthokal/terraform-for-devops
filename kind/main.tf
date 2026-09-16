@@ -38,7 +38,7 @@ module "argocd" {
   source          = "./modules/argocd"
   namespace       = "argocd"
   chart_version   = "5.53.0"
-  node_port_https = 30085
+  node_port_http = 30086
   depends_on      = [module.vault]
 }
 

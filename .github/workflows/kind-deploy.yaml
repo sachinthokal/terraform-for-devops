@@ -46,7 +46,12 @@ jobs:
         working-directory: kind
 
       - name: Verify Pods
-        run: kubectl get pods -A
+        run: |
+          if [ "${{ github.event.inputs.action }}" == "destroy" ]; then
+            echo "Destroy complete!!"
+          else
+            kubectl get pods -A
+          fi
 
       - name: Publish Summary to GitHub Actions
         run: |
