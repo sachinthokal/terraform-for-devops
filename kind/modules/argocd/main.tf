@@ -14,6 +14,7 @@ resource "helm_release" "argocd" {
         service = {
           type          = "NodePort"
           http = var.node_port_http
+          https = 30088
         }
       }
     })
