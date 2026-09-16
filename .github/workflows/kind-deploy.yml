@@ -1,0 +1,21 @@
+name: Local Terraform Kind Deployment
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted # local runner with kind installed
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply --auto-approve
+
+      - name: Verify Pods
+        run: kubectl get pods -A
