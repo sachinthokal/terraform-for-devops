@@ -16,7 +16,7 @@ on:
 
 jobs:
   manage-cluster:
-    runs-on: [self-hosted, sachin-pc]
+    runs-on: [self-hosted]
     defaults:
       run:
         working-directory: ./kind
