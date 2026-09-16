@@ -1,0 +1,37 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: ${cluster_name}
+networking:
+  disableDefaultCNI: ${disable_default_cni}
+  podSubnet: "${pod_subnet}"
+nodes:
+- role: control-plane
+  image: ${node_image}
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: ${ingress_http_port}
+    protocol: TCP
+  - containerPort: 443
+    hostPort: ${ingress_https_port}
+    protocol: TCP
+  - containerPort: 30085
+    hostPort: ${argocd_host_port}
+    protocol: TCP
+  - containerPort: 30084
+    hostPort: ${vault_host_port}
+    protocol: TCP
+%{ for pm in port_mappings ~}
+  - containerPort: ${pm.container_port}
+    hostPort: ${pm.host_port}
+    protocol: ${pm.protocol}
+%{ endfor ~}
+- role: worker
+  image: ${node_image}
+- role: worker
+  image: ${node_image}
