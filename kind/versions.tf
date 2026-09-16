@@ -1,6 +1,11 @@
 terraform {
   required_version = ">= 1.5.0"
 
+  # backend block  👈 Local backend 
+  backend "local" {
+    path = "terraform.tfstate"
+  }
+
   required_providers {
     kubectl = {
       source  = "gavinbunney/kubectl"
