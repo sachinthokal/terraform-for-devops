@@ -5,18 +5,17 @@ resource "helm_release" "argocd" {
   version          = var.chart_version
   namespace        = var.namespace
   create_namespace = true
-  wait             = true
-  timeout          = 600
+
+  wait    = true
+  timeout = 600
 
   values = [
     yamlencode({
       server = {
         service = {
-          type = "NodePort"
-          nodePorts = {
-            http  = var.node_port_http
-            https = 30088
-          }
+          type          = "NodePort"
+          nodePortHttp  = var.node_port_http
+          nodePortHttps = 30088
         }
       }
     })
