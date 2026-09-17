@@ -2,6 +2,8 @@ name: Reusable Gitleaks Scan
 
 on:
   workflow_call: # 👈 Call this workflow from any other workflows.
+  push:
+    branches: [ main ]
 
 jobs:
   gitleaks:
