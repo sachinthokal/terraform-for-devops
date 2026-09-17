@@ -46,16 +46,18 @@ jobs:
         working-directory: kind
 
       - name: Verify Pods
+        id: destroy-step
         run: |
           if [ "${{ github.event.inputs.action }}" == "destroy" ]; then
-            echo "Destroy complete!!"
+            echo "status=Destroy Successfully!!" >> $GITHUB_OUTPUT
           else
             kubectl get pods -A
+            echo "status=Deployed Successfully!!" >> $GITHUB_OUTPUT
           fi
 
       - name: Publish Summary to GitHub Actions
         run: |
-          echo "### 🚀 Local DevOps Cluster Deployed Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 Local DevOps Cluster ${{ steps.destroy-step.outputs.status }}" >> $GITHUB_STEP_SUMMARY
           echo "#### 🔗 Access Endpoints:" >> $GITHUB_STEP_SUMMARY
           echo "| Service | URL / Port | Credentials |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|---|" >> $GITHUB_STEP_SUMMARY
