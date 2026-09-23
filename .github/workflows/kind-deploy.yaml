@@ -30,7 +30,7 @@ jobs:
     runs-on: self-hosted    # sachin-pc runner
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Terraform Init
         run: terraform init
@@ -49,10 +49,10 @@ jobs:
         id: destroy-step
         run: |
           if [ "${{ github.event.inputs.action }}" == "destroy" ]; then
-            echo "status=Destroy Successfully!!" >> $GITHUB_OUTPUT
+            echo "status=🚀 Local DevOps Cluster Destroyed Successfully!!" >> $GITHUB_OUTPUT
           else
             kubectl get pods -A
-            echo "status=Deployed Successfully!!" >> $GITHUB_OUTPUT
+            echo "status=🚀 Local DevOps Cluster Deployed Successfully!!" >> $GITHUB_OUTPUT
           fi
 
       - name: Publish Summary to GitHub Actions
