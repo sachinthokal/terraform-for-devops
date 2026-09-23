@@ -1,11 +1,6 @@
 name: Local Terraform Kind Deployment
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'kind/**'                             # Check for changes in the kind directory
-      - '.github/workflows/kind-deploy.yaml'   # Check for changes in the workflow file
   workflow_dispatch:
     inputs:
       action:
@@ -16,6 +11,7 @@ on:
         options:
           - apply
           - destroy
+          - refresh
 
 jobs:
   # 1. Reusable GitLeak workflow call
@@ -36,20 +32,25 @@ jobs:
         run: terraform init
         working-directory: kind
 
-      - name: Terraform Apply or Destroy
+      - name: Terraform Apply, Destroy or Refresh
         run: |
           if [ "${{ github.event.inputs.action }}" == "destroy" ]; then
             terraform destroy --auto-approve
+          elif [ "${{ github.event.inputs.action }}" == "refresh" ]; then
+            terraform refresh
           else
             terraform apply --auto-approve
           fi
-        working-directory: kind
+        working-directory: kind 
 
       - name: Verify Pods
         id: destroy-step
         run: |
           if [ "${{ github.event.inputs.action }}" == "destroy" ]; then
             echo "status=🚀 Local DevOps Cluster Destroyed Successfully!!" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.inputs.action }}" == "refresh" ]; then
+            kubectl get pods -A
+            echo "status=🔄 Local DevOps Cluster Refreshed Successfully!!" >> $GITHUB_OUTPUT
           else
             kubectl get pods -A
             echo "status=🚀 Local DevOps Cluster Deployed Successfully!!" >> $GITHUB_OUTPUT
@@ -57,15 +58,19 @@ jobs:
 
       - name: Publish Summary to GitHub Actions
         run: |
-          echo "### 🚀 Local DevOps Cluster ${{ steps.destroy-step.outputs.status }}" >> $GITHUB_STEP_SUMMARY
-          echo "#### 🔗 Access Endpoints:" >> $GITHUB_STEP_SUMMARY
-          echo "| Service | URL / Port | Credentials |" >> $GITHUB_STEP_SUMMARY
-          echo "|---|---|---|" >> $GITHUB_STEP_SUMMARY
-          echo "| **ArgoCD** | \`https://localhost:8086\` | User: \`admin\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Vault** | \`https://localhost:8087\` | User: \`admin\` / Pass: \`root\` |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "#### 🛠️ Useful Commands:" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
-          echo "# Get ArgoCD Password:" >> $GITHUB_STEP_SUMMARY
-          echo "kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d && echo" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "### ${{ steps.destroy-step.outputs.status }}" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ github.event.inputs.action }}" != "destroy" ]; then
+            echo "#### 🔗 Access Endpoints:" >> $GITHUB_STEP_SUMMARY
+            echo "| Service | URL / Port | Credentials |" >> $GITHUB_STEP_SUMMARY
+            echo "|---|---|---|" >> $GITHUB_STEP_SUMMARY
+            echo "| **ArgoCD** | \`https://localhost:8086\` | User: \`admin\` |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Vault** | \`https://localhost:8087\` | User: \`admin\` / Pass: \`root\` |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            echo "#### 🛠️ Useful Commands:" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+            echo "# Get ArgoCD Password:" >> $GITHUB_STEP_SUMMARY
+            echo "kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d && echo" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
