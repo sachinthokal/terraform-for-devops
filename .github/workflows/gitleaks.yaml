@@ -1,4 +1,4 @@
-name: Reusable Gitleaks Scan
+name: Gitleaks Scan
 
 on:
   workflow_call: # 👈 Call this workflow from any other workflows.
